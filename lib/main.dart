@@ -13,7 +13,7 @@ class MusicLibraryApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Music_Library",
-        home: TrackDetailsScreen(),
+        home: LibraryScreen(),
         routes: {
           "/TrackDetailScreen":(context)=>TrackDetailsScreen(),
            "/LibraryScreen":(context)=>LibraryScreen()

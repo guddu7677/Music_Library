@@ -1,41 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:music_library/models/track.dart';
+import 'package:music_library/repositories/track_repository.dart';
 
-class LibraryScreen extends StatelessWidget {
+class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
 
   @override
+  State<LibraryScreen> createState() => _LibraryScreenState();
+}
+
+class _LibraryScreenState extends State<LibraryScreen> {
+
+  final TrackRepository _repository = TrackRepository();
+
+  final ScrollController _scrollController = ScrollController();
+
+  final TextEditingController _searchController = TextEditingController();
+
+  List<Track> tracks = [];
+
+  PageCursor cursor = PageCursor.start;
+
+  bool isLoading = false;
+
+  bool isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    loadTracks();
+
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >
+        _scrollController.position.maxScrollExtent - 200) {
+      loadTracks();
+    }
+  }
+
+  Future<void> loadTracks() async {
+    if (isLoading || cursor.isExhausted || isSearching) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    final result = await _repository.loadNextPage(cursor);
+
+    setState(() {
+      tracks.addAll(result.tracks);
+      cursor = result.nextCursor;
+      isLoading = false;
+    });
+  }
+
+  Future<void> searchTracks(String query) async {
+
+    if (query.trim().isEmpty) {
+      setState(() {
+        isSearching = false;
+        tracks.clear();
+        cursor = PageCursor.start;
+      });
+
+      loadTracks();
+      return;
+    }
+
+    setState(() {
+      isSearching = true;
+    });
+
+    final results = await _repository.searchTracks(query);
+
+    setState(() {
+      tracks = results;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<Map<String, String>> tracks = [
-      {"title": "tu hi hai ", "artist": "arjit singh"},
-      {"title": "tere bin", "artist": "atif aslam"},
-      {"title": "baarish", "artist": "Jubin da"},
-    ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           _AppHeader(),
-           _SearchBar(),
+
+          _AppHeader(totalTracks: tracks.length),
+
+          _SearchBar(
+            controller: _searchController,
+            onChanged: searchTracks,
+          ),
+
            _GroupByToggle(),
 
           Expanded(
             child: ListView.builder(
-              itemCount: tracks.length,
+              controller: _scrollController,
+              itemCount: tracks.length + (isLoading ? 1 : 0),
               itemBuilder: (context, index) {
+
+                if (index >= tracks.length) {
+                  return  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
                 final track = tracks[index];
 
                 return ListTile(
                   leading:  CircleAvatar(
                     child: Icon(Icons.music_note),
                   ),
+
                   title: Text(
-                    track["title"]!,
+                    track.title,
                     style:  TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text(track["artist"]!),
+
+                  subtitle: Text("huuh"),
+
                   trailing:  Icon(Icons.chevron_right),
+
                   onTap: () {},
                 );
               },
@@ -48,10 +138,14 @@ class LibraryScreen extends StatelessWidget {
 }
 
 class _AppHeader extends StatelessWidget {
-  const _AppHeader();
+
+  final int totalTracks;
+
+   _AppHeader({required this.totalTracks});
 
   @override
   Widget build(BuildContext context) {
+
     final statusBarH = MediaQuery.of(context).padding.top;
     final cs = Theme.of(context).colorScheme;
 
@@ -60,6 +154,7 @@ class _AppHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
           Text(
             "YOUR COLLECTION",
             style: TextStyle(
@@ -69,7 +164,9 @@ class _AppHeader extends StatelessWidget {
               letterSpacing: 2,
             ),
           ),
+
            SizedBox(height: 5),
+
           Text(
             "Music Library",
             style: TextStyle(
@@ -78,16 +175,18 @@ class _AppHeader extends StatelessWidget {
               color: cs.onSurface,
             ),
           ),
+
            SizedBox(height: 6),
+
           Container(
             padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color: cs.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child:  Text(
-              "6 tracks",
-              style: TextStyle(fontSize: 12),
+            child: Text(
+              "$totalTracks tracks",
+              style:  TextStyle(fontSize: 12),
             ),
           )
         ],
@@ -97,15 +196,26 @@ class _AppHeader extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar();
+
+  final TextEditingController controller;
+
+  final Function(String) onChanged;
+
+   _SearchBar({
+    required this.controller,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
+
     final cs = Theme.of(context).colorScheme;
 
     return Padding(
       padding:  EdgeInsets.all(14),
       child: TextField(
+        controller: controller,
+        onChanged: onChanged,
         decoration: InputDecoration(
           hintText: "Search tracks...",
           prefixIcon:  Icon(Icons.search),
@@ -122,18 +232,24 @@ class _SearchBar extends StatelessWidget {
 }
 
 class _GroupByToggle extends StatelessWidget {
-  const _GroupByToggle();
+   _GroupByToggle();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:  EdgeInsets.symmetric(horizontal: 14),
+
+    return  Padding(
+      padding: EdgeInsets.symmetric(horizontal: 14),
       child: Row(
         children: [
-           Text("Group by: "),
-           SizedBox(width: 10),
+
+          Text("Group by: "),
+
+          SizedBox(width: 10),
+
           _Chip(label: "Title"),
-           SizedBox(width: 8),
+
+          SizedBox(width: 8),
+
           _Chip(label: "Artist"),
         ],
       ),
@@ -142,12 +258,14 @@ class _GroupByToggle extends StatelessWidget {
 }
 
 class _Chip extends StatelessWidget {
+
   final String label;
 
-  const _Chip({required this.label});
+   _Chip({required this.label});
 
   @override
   Widget build(BuildContext context) {
+
     return Chip(
       label: Text(label),
     );
