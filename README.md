@@ -11,8 +11,13 @@ This project is a starting point for a Flutter application.
 Is project model me maine Equatable package use kiya hai taaki objects ki value based comparison easily ho sake.
 and library screen ki list baana di hai.
 
+## 2. api service and connectivity plus 
 
-
+http and connectivity plus package ka use kiye hain 
+http ka api call and internet band hone pe message show karne ke liye connectivity plus ka
+NoInternetException custom exeption banaya jo ki agar internet close ho jaat hai to screen pe message show karegi. 
+ try catch ke throgh error ko handle kiye hain and track details screen banayena haian 
+ 
 
 
 
