@@ -19,6 +19,10 @@ NoInternetException custom exeption banaya jo ki agar internet close ho jaat hai
  try catch ke throgh error ko handle kiye hain and track details screen banayena haian 
  
 
+## 3. search by name and number (track reporsitory)
+issue:  Search karte waqt bhi pagination scroll listener se call ho raha tha jisse unwanted tracks list me add ho rahe the.
+
+fix:  isSearching boolean flag add kiya taaki search mode me pagination disable rahe.
 
 
 
