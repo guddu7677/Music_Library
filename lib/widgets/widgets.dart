@@ -7,7 +7,7 @@ class TrackTile extends StatelessWidget {
   final VoidCallback? onTap;
   final bool isPlaying;
 
-  const TrackTile({
+const TrackTile({
     super.key,
     required this.track,
     this.onTap,
@@ -23,9 +23,9 @@ class TrackTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           color: isPlaying
@@ -42,16 +42,16 @@ class TrackTile extends StatelessWidget {
                   BoxShadow(
                     color: cs.primary.withOpacity(0.15),
                     blurRadius: 16,
-                    offset: const Offset(0, 4),
+                    offset: Offset(0, 4),
                   ),
                 ]
               : [],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Row(
           children: [
             _AlbumArt(url: track.album.coverSmall, isPlaying: isPlaying),
-            const SizedBox(width: 14),
+           SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +67,7 @@ class TrackTile extends StatelessWidget {
                       letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                 SizedBox(height: 3),
                   Text(
                     track.artist.name,
                     maxLines: 1,
@@ -77,19 +77,19 @@ class TrackTile extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                 SizedBox(height: 2),
                   Text(
                     'ID: ${track.id}',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: cs.onSurface.withOpacity(0.25),
                       fontSize: 9,
-                      fontFeatures: const [FontFeature.tabularFigures()],
+                      fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 10),
+           SizedBox(width: 10),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -99,11 +99,11 @@ class TrackTile extends StatelessWidget {
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: cs.onSurface.withOpacity(0.4),
                     fontSize: 11,
-                    fontFeatures: const [FontFeature.tabularFigures()],
+                    fontFeatures: [FontFeature.tabularFigures()],
                   ),
                 ),
                 if (track.explicitLyrics) ...[
-                  const SizedBox(height: 5),
+                 SizedBox(height: 5),
                   _ExplicitBadge(),
                 ],
               ],
@@ -119,13 +119,13 @@ class _ExplicitBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.15),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: Colors.red.withOpacity(0.3), width: 1),
       ),
-      child: const Text(
+      child: Text(
         'E',
         style: TextStyle(
           fontSize: 9,
@@ -142,7 +142,7 @@ class _AlbumArt extends StatelessWidget {
   final String? url;
   final bool isPlaying;
 
-  const _AlbumArt({this.url, required this.isPlaying});
+ _AlbumArt({this.url, required this.isPlaying});
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +159,7 @@ class _AlbumArt extends StatelessWidget {
               BoxShadow(
                 color: Colors.black.withOpacity(0.35),
                 blurRadius: 10,
-                offset: const Offset(0, 4),
+                offset: Offset(0, 4),
               ),
             ],
           ),
@@ -184,7 +184,7 @@ class _AlbumArt extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 color: cs.primary.withOpacity(0.55),
-                child: const Center(child: _PlayingBars()),
+                child: Center(child: _PlayingBars()),
               ),
             ),
           ),
@@ -202,13 +202,13 @@ class _AlbumArt extends StatelessWidget {
             colors: [Colors.grey.shade800, Colors.grey.shade900],
           ),
         ),
-        child: const Icon(Icons.music_note_rounded,
+        child: Icon(Icons.music_note_rounded,
             color: Colors.white24, size: 22),
       );
 }
 
 class _PlayingBars extends StatefulWidget {
-  const _PlayingBars();
+ _PlayingBars();
 
   @override
   State<_PlayingBars> createState() => _PlayingBarsState();
@@ -249,7 +249,7 @@ class _PlayingBarsState extends State<_PlayingBars>
           builder: (_, __) => Container(
             width: 3,
             height: 6 + (_controllers[i].value * 14),
-            margin: const EdgeInsets.symmetric(horizontal: 1.5),
+            margin: EdgeInsets.symmetric(horizontal: 1.5),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(2),
@@ -265,14 +265,14 @@ class StickyHeader extends StatelessWidget {
   final String label;
   final int? count;
 
-  const StickyHeader({super.key, required this.label, this.count});
+ StickyHeader({super.key, required this.label, this.count});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       decoration: BoxDecoration(
         color: cs.primary.withOpacity(0.07),
         border: Border(
@@ -292,7 +292,7 @@ class StickyHeader extends StatelessWidget {
               letterSpacing: 2.0,
             ),
           ),
-          const SizedBox(width: 10),
+         SizedBox(width: 10),
           Expanded(
             child: Container(
               height: 1,
@@ -304,10 +304,10 @@ class StickyHeader extends StatelessWidget {
             ),
           ),
           if (count != null) ...[
-            const SizedBox(width: 10),
+           SizedBox(width: 10),
             Container(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                 EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: cs.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
@@ -331,7 +331,7 @@ class StickyHeader extends StatelessWidget {
 }
 
 class NoInternetBanner extends StatefulWidget {
-  const NoInternetBanner({super.key});
+ NoInternetBanner({super.key});
 
   @override
   State<NoInternetBanner> createState() => _NoInternetBannerState();
@@ -346,7 +346,7 @@ class _NoInternetBannerState extends State<NoInternetBanner>
     super.initState();
     _dotController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: Duration(milliseconds: 1200),
     )..repeat(reverse: true);
   }
 
@@ -360,7 +360,7 @@ class _NoInternetBannerState extends State<NoInternetBanner>
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF7B0000), Color(0xFFB00020)],
         ),
@@ -368,7 +368,7 @@ class _NoInternetBannerState extends State<NoInternetBanner>
           bottom: BorderSide(color: Color(0x33FF5050)),
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 18),
       child: Row(
         children: [
           Container(
@@ -378,11 +378,11 @@ class _NoInternetBannerState extends State<NoInternetBanner>
               color: Colors.white.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.wifi_off_rounded,
+            child: Icon(Icons.wifi_off_rounded,
                 color: Colors.white, size: 13),
           ),
-          const SizedBox(width: 10),
-          const Text(
+         SizedBox(width: 10),
+         Text(
             'NO INTERNET CONNECTION',
             style: TextStyle(
               color: Colors.white,
@@ -391,7 +391,7 @@ class _NoInternetBannerState extends State<NoInternetBanner>
               letterSpacing: 1.4,
             ),
           ),
-          const Spacer(),
+         Spacer(),
           AnimatedBuilder(
             animation: _dotController,
             builder: (_, __) => Container(

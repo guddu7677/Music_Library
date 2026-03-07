@@ -9,7 +9,7 @@ import 'package:music_library/repositories/track_repository.dart';
 
 class TrackDetailScreen extends StatelessWidget {
   final Track track;
-  const TrackDetailScreen({super.key, required this.track});
+const TrackDetailScreen({super.key, required this.track});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class TrackDetailScreen extends StatelessWidget {
 
 class _TrackDetailView extends StatelessWidget {
   final Track track;
-  const _TrackDetailView({required this.track});
+ _TrackDetailView({required this.track});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class _TrackDetailView extends StatelessWidget {
                   children: [
                     _DetailSection(state: state, track: track),
                     _LyricsSection(state: state, trackId: track.id),
-                    const SizedBox(height: 48),
+                   SizedBox(height: 48),
                   ],
                 ),
               ),
@@ -57,7 +57,7 @@ class _TrackDetailView extends StatelessWidget {
 class _SliverHeader extends StatelessWidget {
   final TrackDetailState state;
   final Track track;
-  const _SliverHeader({required this.state, required this.track});
+ _SliverHeader({required this.state, required this.track});
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _SliverHeader extends StatelessWidget {
       backgroundColor: cs.surface,
       elevation: 0,
       leading: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8),
         child: GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: Container(
@@ -79,7 +79,7 @@ class _SliverHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white.withOpacity(0.1)),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back_ios_new,
               color: Colors.white,
               size: 16,
@@ -107,7 +107,7 @@ class _SliverHeader extends StatelessWidget {
                   )
                 : _CoverPlaceholder(),
 
-            const DecoratedBox(
+           DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -128,13 +128,13 @@ class _SliverHeader extends StatelessWidget {
                 right: 16,
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                     EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.red.withOpacity(0.35)),
                   ),
-                  child: const Text(
+                  child: Text(
                     'EXPLICIT',
                     style: TextStyle(
                       fontSize: 9,
@@ -156,14 +156,14 @@ class _CoverPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [Color(0xFF1A1F38), Color(0xFF0E1120)],
         ),
       ),
-      child: const Center(
+      child: Center(
         child: Icon(Icons.album_rounded, size: 80, color: Colors.white10),
       ),
     );
@@ -173,21 +173,21 @@ class _CoverPlaceholder extends StatelessWidget {
 class _DetailSection extends StatelessWidget {
   final TrackDetailState state;
   final Track track;
-  const _DetailSection({required this.state, required this.track});
+ const _DetailSection({required this.state, required this.track});
 
   @override
   Widget build(BuildContext context) {
     switch (state.detailStatus) {
       case TrackDetailStatus.initial:
       case TrackDetailStatus.loading:
-        return const Padding(
+        return Padding(
           padding: EdgeInsets.symmetric(vertical: 48),
           child: Center(child: CircularProgressIndicator()),
         );
 
       case TrackDetailStatus.noInternet:
         return Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: _NoInternetWidget(
             onRetry: () => context
                 .read<TrackDetailBloc>()
@@ -197,7 +197,7 @@ class _DetailSection extends StatelessWidget {
 
       case TrackDetailStatus.failure:
         return Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: _ErrorWidget(
             message: state.detailError ?? 'Failed to load details',
             onRetry: () => context
@@ -214,20 +214,20 @@ class _DetailSection extends StatelessWidget {
 
 class _SuccessDetail extends StatelessWidget {
   final TrackDetail detail;
-  const _SuccessDetail({required this.detail});
+ _SuccessDetail({required this.detail});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+      padding: EdgeInsets.fromLTRB(20, 4, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             detail.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w900,
               color: Colors.white,
@@ -235,7 +235,7 @@ class _SuccessDetail extends StatelessWidget {
               height: 1.1,
             ),
           ),
-          const SizedBox(height: 16),
+         SizedBox(height: 16),
 
           _InfoRow(
             leading: detail.artistPicture.isNotEmpty
@@ -253,7 +253,7 @@ class _SuccessDetail extends StatelessWidget {
             label: 'Artist',
             value: detail.artistName,
           ),
-          const SizedBox(height: 10),
+         SizedBox(height: 10),
 
           _InfoRow(
             leading: Container(
@@ -270,7 +270,7 @@ class _SuccessDetail extends StatelessWidget {
             label: 'Album',
             value: detail.albumTitle,
           ),
-          const SizedBox(height: 18),
+         SizedBox(height: 18),
 
           Wrap(
             spacing: 8,
@@ -289,14 +289,14 @@ class _SuccessDetail extends StatelessWidget {
                 label: 'ID ${detail.id}',
               ),
               if (detail.explicitLyrics)
-                const _InfoChip(
+               _InfoChip(
                   icon: Icons.explicit_rounded,
                   label: 'Explicit',
                   isRed: true,
                 ),
             ],
           ),
-          const SizedBox(height: 24),
+         SizedBox(height: 24),
 
           Container(
             height: 1,
@@ -332,7 +332,7 @@ class _InfoRow extends StatelessWidget {
   final Widget leading;
   final String label;
   final String value;
-  const _InfoRow(
+ _InfoRow(
       {required this.leading, required this.label, required this.value});
 
   @override
@@ -341,7 +341,7 @@ class _InfoRow extends StatelessWidget {
     return Row(
       children: [
         leading,
-        const SizedBox(width: 12),
+       SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,12 +355,12 @@ class _InfoRow extends StatelessWidget {
                   letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 2),
+             SizedBox(height: 2),
               Text(
                 value,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -379,7 +379,7 @@ class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isRed;
-  const _InfoChip(
+ _InfoChip(
       {required this.icon, required this.label, this.isRed = false});
 
   @override
@@ -387,7 +387,7 @@ class _InfoChip extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final color = isRed ? Colors.redAccent : cs.onSurface.withOpacity(0.55);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
         color: isRed
             ? Colors.red.withOpacity(0.1)
@@ -403,7 +403,7 @@ class _InfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 13, color: color),
-          const SizedBox(width: 5),
+         SizedBox(width: 5),
           Text(
             label,
             style: TextStyle(
@@ -422,13 +422,13 @@ class _InfoChip extends StatelessWidget {
 class _LyricsSection extends StatelessWidget {
   final TrackDetailState state;
   final int trackId;
-  const _LyricsSection({required this.state, required this.trackId});
+ _LyricsSection({required this.state, required this.trackId});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -443,7 +443,7 @@ class _LyricsSection extends StatelessWidget {
                   letterSpacing: -0.3,
                 ),
               ),
-              const SizedBox(width: 10),
+             SizedBox(width: 10),
               Expanded(
                 child: Container(
                   height: 1,
@@ -459,7 +459,7 @@ class _LyricsSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+         SizedBox(height: 14),
           _buildContent(context),
         ],
       ),
@@ -472,7 +472,7 @@ class _LyricsSection extends StatelessWidget {
     switch (state.lyricsStatus) {
       case TrackDetailStatus.initial:
       case TrackDetailStatus.loading:
-        return const Center(
+        return Center(
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
             child: CircularProgressIndicator(),
@@ -499,7 +499,7 @@ class _LyricsSection extends StatelessWidget {
 
         if (lyrics == null || !lyrics.available) {
           return Container(
-            padding: const EdgeInsets.all(18),
+            padding: EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: cs.onSurface.withOpacity(0.04),
               borderRadius: BorderRadius.circular(16),
@@ -509,7 +509,7 @@ class _LyricsSection extends StatelessWidget {
               children: [
                 Icon(Icons.lyrics_outlined,
                     color: cs.onSurface.withOpacity(0.2), size: 22),
-                const SizedBox(width: 12),
+               SizedBox(width: 12),
                 Text(
                   'Lyrics not available for this track.',
                   style: TextStyle(
@@ -525,7 +525,7 @@ class _LyricsSection extends StatelessWidget {
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: cs.onSurface.withOpacity(0.04),
             borderRadius: BorderRadius.circular(16),
@@ -548,12 +548,12 @@ class _LyricsSection extends StatelessWidget {
 
 class _NoInternetWidget extends StatelessWidget {
   final VoidCallback onRetry;
-  const _NoInternetWidget({required this.onRetry});
+ _NoInternetWidget({required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
@@ -562,7 +562,7 @@ class _NoInternetWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+         Row(
             children: [
               Icon(Icons.wifi_off_rounded, color: Colors.redAccent, size: 20),
               SizedBox(width: 10),
@@ -577,17 +577,17 @@ class _NoInternetWidget extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+         SizedBox(height: 14),
           FilledButton.icon(
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded, size: 16),
-            label: const Text('Try Again',
+            icon: Icon(Icons.refresh_rounded, size: 16),
+            label: Text('Try Again',
                 style: TextStyle(fontWeight: FontWeight.w700)),
             style: FilledButton.styleFrom(
               backgroundColor: Colors.red.withOpacity(0.2),
               foregroundColor: Colors.redAccent,
               padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                 EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
@@ -601,12 +601,12 @@ class _NoInternetWidget extends StatelessWidget {
 class _ErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
-  const _ErrorWidget({required this.message, required this.onRetry});
+ _ErrorWidget({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.orange.withOpacity(0.07),
         borderRadius: BorderRadius.circular(16),
@@ -617,13 +617,13 @@ class _ErrorWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.error_outline_rounded,
+             Icon(Icons.error_outline_rounded,
                   color: Colors.orange, size: 20),
-              const SizedBox(width: 10),
+             SizedBox(width: 10),
               Expanded(
                 child: Text(
                   message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.orange,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
@@ -632,17 +632,17 @@ class _ErrorWidget extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+         SizedBox(height: 14),
           FilledButton.icon(
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded, size: 16),
-            label: const Text('Retry',
+            icon: Icon(Icons.refresh_rounded, size: 16),
+            label: Text('Retry',
                 style: TextStyle(fontWeight: FontWeight.w700)),
             style: FilledButton.styleFrom(
               backgroundColor: Colors.orange.withOpacity(0.15),
               foregroundColor: Colors.orange,
               padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                 EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
