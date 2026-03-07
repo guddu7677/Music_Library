@@ -62,9 +62,42 @@ Issue: Large track list hone par unnecessary UI rebuild ho rahi thi.
 Fix: Equatable use karke state comparison optimize kiya.
 
 
+5. app ka flow
+App open hote hi main.dart mein LibraryBloc provide hota hai. Yeh BLoC poori app ke liye ek hi baar banta hai aur root pe hota hai kyunki library screen ko poori app mein chahiye.
+LibraryScreen khulte hi LibraryStarted event fire hoti hai. BLoC yeh event pakadta hai, ApiService ke through server se pehle 50 tracks fetch karta hai, unhe alphabetically sort karke displayItems list banta hai jisme StickyHeaderItem (A, B, C headers) aur TrackListItem (actual tracks) mix hote hain. UI yeh list render karta hai.
+#search
+Jab user search box mein type karta hai, har keystroke pe LibrarySearchChanged(query) event jaati hai BLoC ko. BLoC us query se server pe nayi call karta hai. Purani list clear hoti hai, nayi aati hai.
+Cross button press karo toh LibrarySearchCleared jaata hai — query empty ho jaati hai aur default 'a' se dobara tracks aate hain.
+A few resources to get you started if this is your first Flutter project
+
+#scrolling
+ScrollController ka listener lagaya hai _LibraryScreenState mein. Jab user bottom se 400px door hota hai tab LibraryLoadMoreRequested fire hota hai.
+BLoC check karta hai agar isLoadingMore true hai ya hasMore false hai toh event ignore karo. Warna index + limit pe nayi call jaati hai aur nayi tracks purani list mein append ho jaati hain.
+hasMore ka logic simple hai — agar server ne 50 maange aur 50 diye toh probably aur hain.
+
+#group
+User Title A–Z ya Artist A–Z select karta hai. LibraryGroupByChanged event jaati hai. BLoC same allTracks list ko dobara sort aur group karta hai — nayi API call nahi jaati. Sirf displayItems rebuild hota hai
+
+#issues
+
+Issue 1: Duplicate scroll events — same tracks dobara aa rahe the
+Kya hua: Jab user scroll karta tha, _onScroll listener milliseconds mein 4-5 baar fire ho jaata tha kyunki pixels >= maxScrollExtent - 400 condition kaafi der tak true rehti thi. Iska matlab ek hi baar scroll karne pe 4-5 API calls chali jaati thin aur same tracks list mein double ho jaate the.
+Fix: BLoC mein isLoadingMore flag add kiya. Jab pehli call jaati hai toh flag true ho jaata hai. Jab tak response nahi aata tab tak nayi call nahi jaa
+
+2.
+Problem yeh thi ki jab user retry karta tha aur detail successfully load hoti thi, toh copyWith mein detailError: null pass hota tha. Lekin null ?? this.detailError matlab purana error string hi reh jaata tha state mein. Successful retry ke baad bhi error message dikhta tha.
+
+Fix: Sentinel pattern use kiya — ek private object banaya jo "not passed" represent karta hai.
 
 
-A few resources to get you started if this is your first Flutter project:
+
+
+##  What Breaks at 100k Tracks
+ ha kaafi kuch.
+Client-side filtering slow ho jaayegi. Abhi search allTracks pe locally filter hoti hai. 100k objects RAM mein rakho aur har keystroke pe filter karo — low-end phones pe 200-300ms lag sakta hai. UI janky lagegi.
+Memory pressure. 100k Track objects in-memory roughly 30-50MB+ RAM. Flutter handle kar leta hai but background mein app kill ho sakti hai low RAM phones pe.
+displayItems rebuild costly hogi. Grouping aur sorting 100k items pe main thread block kar sakti hai.
+hasMore edge case. Agar last page exactly 50 tracks pe khatam ho toh ek extra empty call jaayegi. Crash nahi hoga but useless network request
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
 - [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
