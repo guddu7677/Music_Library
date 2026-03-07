@@ -1,3 +1,7 @@
+Ma’am/sir, abhi main notice period par hoon, isliye mujhe company ka kaafi zyada work handle karna pad raha hai. Office timing 10 AM se 6:30 PM tak rehti hai, isi wajah se task complete karne me thoda time lag gaya. Phir bhi maine time nikaal kar task complete kar liya hai.
+
+
+
 # music_library
 
 A new Flutter project.
@@ -103,6 +107,13 @@ hasMore edge case. Agar last page exactly 50 tracks pe khatam ho toh ek extra em
 ##Demo Video link
 
 https://youtube.com/shorts/H5qqPGOj8D0?si=j2fLN5KrDrBol2F1
+
+
+Is project me ideally har screen ke reusable widgets ko alag widgets folder me rakhna chahiye, taaki code clean aur reusable rahe. Abhi maine widgets ko directly har screen file me implement kiya hai.
+
+Is task me maine color theme ko constants me define nahi kiya. Real projects me colors, text styles aur images ko constants me rakhte hain, taaki ek hi file se easily update kiya ja sake.
+
+UI maine apni understanding ke according banaya hai, lekin requirement ho to exact reference design ke according bhi implement kiya ja sakta ha
 
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
