@@ -1,128 +1,653 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:music_library/bloc/track_details/track_detail_bloc.dart';
+import 'package:music_library/bloc/track_details/track_detail_event.dart';
+import 'package:music_library/bloc/track_details/track_state.dart';
+import 'package:music_library/models/track.dart';
+import 'package:music_library/models/track_detail.dart';
+import 'package:music_library/repositories/track_repository.dart';
 
-class TrackDetailsScreen extends StatelessWidget {
-  const TrackDetailsScreen({super.key});
+class TrackDetailScreen extends StatelessWidget {
+  final Track track;
+  const TrackDetailScreen({super.key, required this.track});
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => TrackDetailBloc(repository: TrackRepository())
+        ..add(TrackDetailLoaded(track.id)),
+      child: _TrackDetailView(track: track),
+    );
+  }
+}
+
+class _TrackDetailView extends StatelessWidget {
+  final Track track;
+  const _TrackDetailView({required this.track});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Track Details"),
+      backgroundColor: cs.surface,
+      body: BlocBuilder<TrackDetailBloc, TrackDetailState>(
+        builder: (context, state) {
+          return CustomScrollView(
+            slivers: [
+              _SliverHeader(state: state, track: track),
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _DetailSection(state: state, track: track),
+                    _LyricsSection(state: state, trackId: track.id),
+                    const SizedBox(height: 48),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+}
+
+class _SliverHeader extends StatelessWidget {
+  final TrackDetailState state;
+  final Track track;
+  const _SliverHeader({required this.state, required this.track});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final coverUrl = state.detail?.albumCover ?? '';
+
+    return SliverAppBar(
+      expandedHeight: 280,
+      pinned: true,
+      backgroundColor: cs.surface,
+      elevation: 0,
+      leading: Padding(
+        padding: const EdgeInsets.all(8),
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.4),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+        ),
+      ),
+      title: Text(
+        'Track Details',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: cs.onSurface.withOpacity(0.7),
+        ),
+      ),
+      flexibleSpace: FlexibleSpaceBar(
+        background: Stack(
+          fit: StackFit.expand,
           children: [
-            Image.network(
-              "https://via.placeholder.com/400",
-              width: double.infinity,
-              height: 250,
-              fit: BoxFit.cover,
+            coverUrl.isNotEmpty
+                ? Image.network(
+                    coverUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _CoverPlaceholder(),
+                  )
+                : _CoverPlaceholder(),
+
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.35, 0.75, 1.0],
+                  colors: [
+                    Colors.transparent,
+                    Color(0xCC0C101E),
+                    Color(0xFF0C101E),
+                  ],
+                ),
+              ),
             ),
 
-           SizedBox(height: 20),
-
-            Padding(
-              padding:  EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                   Text(
-                    "Track Title",
+            if (state.detail?.explicitLyrics == true)
+              Positioned(
+                top: 52,
+                right: 16,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.red.withOpacity(0.35)),
+                  ),
+                  child: const Text(
+                    'EXPLICIT',
                     style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 9,
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
                     ),
                   ),
-
-                   SizedBox(height: 15),
-
-                  Row(
-                    children:  [
-                      CircleAvatar(
-                        radius: 22,
-                        child: Icon(Icons.person),
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        "Artist Name",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-
-                   SizedBox(height: 15),
-
-                  Row(
-                    children:  [
-                      Icon(Icons.album),
-                      SizedBox(width: 10),
-                      Text(
-                        "Album Name",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-
-                   SizedBox(height: 20),
-
-                  Wrap(
-                    spacing: 10,
-                    children:  [
-
-                      Chip(
-                        avatar: Icon(Icons.timer, size: 18),
-                        label: Text("Duration: 3:40"),
-                      ),
-
-                      Chip(
-                        avatar: Icon(Icons.trending_up, size: 18),
-                        label: Text("Rank: 1"),
-                      ),
-
-                      Chip(
-                        avatar: Icon(Icons.tag, size: 18),
-                        label: Text("Track ID: 123"),
-                      ),
-
-                      Chip(
-                        avatar: Icon(Icons.explicit, size: 18),
-                        label: Text("Explicit"),
-                      ),
-                    ],
-                  ),
-
-                   SizedBox(height: 30),
-
-                   Text(
-                    "Lyrics",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                   SizedBox(height: 10),
-
-                  Container(
-                    padding:  EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child:  Text(
-                      "Lyrics will appear here...",
-                      style: TextStyle(height: 1.6),
-                    ),
-                  ),
-
-                   SizedBox(height: 40),
-                ],
+                ),
               ),
-            )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CoverPlaceholder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F38), Color(0xFF0E1120)],
+        ),
+      ),
+      child: const Center(
+        child: Icon(Icons.album_rounded, size: 80, color: Colors.white10),
+      ),
+    );
+  }
+}
+
+class _DetailSection extends StatelessWidget {
+  final TrackDetailState state;
+  final Track track;
+  const _DetailSection({required this.state, required this.track});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (state.detailStatus) {
+      case TrackDetailStatus.initial:
+      case TrackDetailStatus.loading:
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 48),
+          child: Center(child: CircularProgressIndicator()),
+        );
+
+      case TrackDetailStatus.noInternet:
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: _NoInternetWidget(
+            onRetry: () => context
+                .read<TrackDetailBloc>()
+                .add(TrackDetailRetried(track.id)),
+          ),
+        );
+
+      case TrackDetailStatus.failure:
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: _ErrorWidget(
+            message: state.detailError ?? 'Failed to load details',
+            onRetry: () => context
+                .read<TrackDetailBloc>()
+                .add(TrackDetailRetried(track.id)),
+          ),
+        );
+
+      case TrackDetailStatus.success:
+        return _SuccessDetail(detail: state.detail!);
+    }
+  }
+}
+
+class _SuccessDetail extends StatelessWidget {
+  final TrackDetail detail;
+  const _SuccessDetail({required this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            detail.title,
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              letterSpacing: -0.5,
+              height: 1.1,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          _InfoRow(
+            leading: detail.artistPicture.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: Image.network(
+                      detail.artistPicture,
+                      width: 44,
+                      height: 44,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _avatarFallback(cs),
+                    ),
+                  )
+                : _avatarFallback(cs),
+            label: 'Artist',
+            value: detail.artistName,
+          ),
+          const SizedBox(height: 10),
+
+          _InfoRow(
+            leading: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: cs.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: cs.primary.withOpacity(0.18)),
+              ),
+              child: Icon(Icons.album_rounded,
+                  size: 22, color: cs.primary.withOpacity(0.7)),
+            ),
+            label: 'Album',
+            value: detail.albumTitle,
+          ),
+          const SizedBox(height: 18),
+
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _InfoChip(
+                icon: Icons.timer_outlined,
+                label: detail.durationFormatted,
+              ),
+              _InfoChip(
+                icon: Icons.trending_up_rounded,
+                label: 'Rank ${detail.rank}',
+              ),
+              _InfoChip(
+                icon: Icons.tag_rounded,
+                label: 'ID ${detail.id}',
+              ),
+              if (detail.explicitLyrics)
+                const _InfoChip(
+                  icon: Icons.explicit_rounded,
+                  label: 'Explicit',
+                  isRed: true,
+                ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  cs.onSurface.withOpacity(0.1),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _avatarFallback(ColorScheme cs) => Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: cs.onSurface.withOpacity(0.06),
+          shape: BoxShape.circle,
+          border: Border.all(color: cs.onSurface.withOpacity(0.08)),
+        ),
+        child: Icon(Icons.person_rounded,
+            size: 22, color: cs.onSurface.withOpacity(0.3)),
+      );
+}
+
+class _InfoRow extends StatelessWidget {
+  final Widget leading;
+  final String label;
+  final String value;
+  const _InfoRow(
+      {required this.leading, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        leading,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: cs.onSurface.withOpacity(0.3),
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: -0.1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isRed;
+  const _InfoChip(
+      {required this.icon, required this.label, this.isRed = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final color = isRed ? Colors.redAccent : cs.onSurface.withOpacity(0.55);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: isRed
+            ? Colors.red.withOpacity(0.1)
+            : cs.onSurface.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isRed
+              ? Colors.red.withOpacity(0.25)
+              : cs.onSurface.withOpacity(0.08),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+              letterSpacing: 0.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LyricsSection extends StatelessWidget {
+  final TrackDetailState state;
+  final int trackId;
+  const _LyricsSection({required this.state, required this.trackId});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Lyrics',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: cs.onSurface,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        cs.onSurface.withOpacity(0.1),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _buildContent(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    switch (state.lyricsStatus) {
+      case TrackDetailStatus.initial:
+      case TrackDetailStatus.loading:
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 32),
+            child: CircularProgressIndicator(),
+          ),
+        );
+
+      case TrackDetailStatus.noInternet:
+        return _NoInternetWidget(
+          onRetry: () => context
+              .read<TrackDetailBloc>()
+              .add(TrackDetailRetried(trackId)),
+        );
+
+      case TrackDetailStatus.failure:
+        return _ErrorWidget(
+          message: state.lyricsError ?? 'Failed to load lyrics',
+          onRetry: () => context
+              .read<TrackDetailBloc>()
+              .add(TrackDetailRetried(trackId)),
+        );
+
+      case TrackDetailStatus.success:
+        final lyrics = state.lyrics;
+
+        if (lyrics == null || !lyrics.available) {
+          return Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: cs.onSurface.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: cs.onSurface.withOpacity(0.07)),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.lyrics_outlined,
+                    color: cs.onSurface.withOpacity(0.2), size: 22),
+                const SizedBox(width: 12),
+                Text(
+                  'Lyrics not available for this track.',
+                  style: TextStyle(
+                    color: cs.onSurface.withOpacity(0.35),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: cs.onSurface.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: cs.onSurface.withOpacity(0.07)),
+          ),
+          child: Text(
+            lyrics.lyricsText!,
+            style: TextStyle(
+              height: 1.9,
+              fontSize: 14,
+              color: cs.onSurface.withOpacity(0.75),
+              fontStyle: FontStyle.italic,
+              letterSpacing: 0.1,
+            ),
+          ),
+        );
+    }
+  }
+}
+
+class _NoInternetWidget extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _NoInternetWidget({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.red.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.wifi_off_rounded, color: Colors.redAccent, size: 20),
+              SizedBox(width: 10),
+              Text(
+                'NO INTERNET CONNECTION',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 16),
+            label: const Text('Try Again',
+                style: TextStyle(fontWeight: FontWeight.w700)),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.withOpacity(0.2),
+              foregroundColor: Colors.redAccent,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorWidget extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorWidget({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.orange.withOpacity(0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.error_outline_rounded,
+                  color: Colors.orange, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded, size: 16),
+            label: const Text('Retry',
+                style: TextStyle(fontWeight: FontWeight.w700)),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.orange.withOpacity(0.15),
+              foregroundColor: Colors.orange,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:music_library/bloc/library/library_bloc.dart';
+import 'package:music_library/screens/track_details_screen.dart';
+import 'package:music_library/widgets/widgets.dart';
 
 class LibraryScreen extends StatefulWidget {
- const  LibraryScreen({super.key});
+  const LibraryScreen({super.key});
 
   @override
   State<LibraryScreen> createState() => _LibraryScreenState();
@@ -16,14 +18,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<LibraryBloc>().add( LibraryStarted());
+    context.read<LibraryBloc>().add(const LibraryStarted());
     _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 400) {
-      context.read<LibraryBloc>().add( LibraryLoadMoreRequested());
+      context.read<LibraryBloc>().add(const LibraryLoadMoreRequested());
     }
   }
 
@@ -68,19 +70,19 @@ class _LibraryScreenState extends State<LibraryScreen> {
         switch (state.status) {
           case LibraryStatus.initial:
           case LibraryStatus.loading:
-            return  _LoadingView();
+            return const _LoadingView();
 
           case LibraryStatus.noInternet:
             return _NoInternetView(
               onRetry: () =>
-                  context.read<LibraryBloc>().add( LibraryStarted()),
+                  context.read<LibraryBloc>().add(const LibraryStarted()),
             );
 
           case LibraryStatus.failure:
             return _ErrorView(
               message: state.errorMessage ?? 'Unknown error',
               onRetry: () =>
-                  context.read<LibraryBloc>().add( LibraryStarted()),
+                  context.read<LibraryBloc>().add(const LibraryStarted()),
             );
 
           case LibraryStatus.success:
@@ -118,7 +120,7 @@ class _AppHeader extends StatelessWidget {
                     letterSpacing: 2.4,
                   ),
                 ),
-                 SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   'Music Library',
                   style: TextStyle(
@@ -129,7 +131,7 @@ class _AppHeader extends StatelessWidget {
                     height: 1,
                   ),
                 ),
-                 SizedBox(height: 8),
+                const SizedBox(height: 8),
                 BlocBuilder<LibraryBloc, LibraryState>(
                   buildWhen: (p, c) =>
                       p.allTracks.length != c.allTracks.length,
@@ -139,11 +141,11 @@ class _AppHeader extends StatelessWidget {
               ],
             ),
           ),
-           SizedBox(width: 12),
+          const SizedBox(width: 12),
           Column(
             children: [
               _IconBtn(icon: Icons.grid_view_rounded, onTap: () {}),
-               SizedBox(height: 8),
+              const SizedBox(height: 8),
               _IconBtn(icon: Icons.sort_rounded, onTap: () {}),
             ],
           ),
@@ -161,7 +163,7 @@ class _CountPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Container(
-      padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: cs.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
@@ -183,7 +185,7 @@ class _CountPill extends StatelessWidget {
 class _IconBtn extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-   _IconBtn({required this.icon, required this.onTap});
+  const _IconBtn({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +214,7 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Padding(
-      padding:  EdgeInsets.fromLTRB(14, 0, 14, 10),
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
       child: TextField(
         controller: controller,
         style: TextStyle(
@@ -238,10 +240,10 @@ class _SearchBar extends StatelessWidget {
                       controller.clear();
                       context
                           .read<LibraryBloc>()
-                          .add( LibrarySearchCleared());
+                          .add(const LibrarySearchCleared());
                     },
                   )
-                :  SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ),
           filled: true,
           fillColor: cs.onSurface.withOpacity(0.045),
@@ -259,7 +261,7 @@ class _SearchBar extends StatelessWidget {
             borderSide: BorderSide(color: cs.primary.withOpacity(0.4), width: 1.5),
           ),
           contentPadding:
-               EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+              const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
         ),
         onChanged: (q) =>
             context.read<LibraryBloc>().add(LibrarySearchChanged(q)),
@@ -268,14 +270,13 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-
 class _GroupByToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LibraryBloc, LibraryState>(
       buildWhen: (p, c) => p.groupBy != c.groupBy,
       builder: (context, state) => Padding(
-        padding:  EdgeInsets.fromLTRB(14, 0, 14, 12),
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
         child: Row(
           children: [
             Text(
@@ -287,21 +288,21 @@ class _GroupByToggle extends StatelessWidget {
                     Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
               ),
             ),
-             SizedBox(width: 10),
+            const SizedBox(width: 10),
             _Chip(
               label: 'Title A–Z',
               selected: state.groupBy == GroupBy.title,
               onTap: () => context
                   .read<LibraryBloc>()
-                  .add( LibraryGroupByChanged(GroupBy.title)),
+                  .add(const LibraryGroupByChanged(GroupBy.title)),
             ),
-             SizedBox(width: 8),
+            const SizedBox(width: 8),
             _Chip(
               label: 'Artist A–Z',
               selected: state.groupBy == GroupBy.artist,
               onTap: () => context
                   .read<LibraryBloc>()
-                  .add( LibraryGroupByChanged(GroupBy.artist)),
+                  .add(const LibraryGroupByChanged(GroupBy.artist)),
             ),
           ],
         ),
@@ -314,7 +315,7 @@ class _Chip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-   _Chip(
+  const _Chip(
       {required this.label, required this.selected, required this.onTap});
 
   @override
@@ -323,9 +324,9 @@ class _Chip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration:  Duration(milliseconds: 220),
+        duration: const Duration(milliseconds: 220),
         curve: Curves.easeInOut,
-        padding:  EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           color: selected ? cs.primary : cs.onSurface.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
@@ -339,7 +340,7 @@ class _Chip extends StatelessWidget {
                   BoxShadow(
                     color: cs.primary.withOpacity(0.3),
                     blurRadius: 10,
-                    offset:  Offset(0, 3),
+                    offset: const Offset(0, 3),
                   )
                 ]
               : [],
@@ -361,7 +362,7 @@ class _Chip extends StatelessWidget {
 class _TrackList extends StatelessWidget {
   final ScrollController scrollController;
   final LibraryState state;
-   _TrackList({required this.scrollController, required this.state});
+  const _TrackList({required this.scrollController, required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -374,7 +375,7 @@ class _TrackList extends StatelessWidget {
           children: [
             Icon(Icons.search_off_rounded,
                 size: 72, color: cs.onSurface.withOpacity(0.15)),
-             SizedBox(height: 14),
+            const SizedBox(height: 14),
             Text(
               state.searchQuery.isNotEmpty
                   ? 'No tracks found for\n"${state.searchQuery}"'
@@ -395,13 +396,13 @@ class _TrackList extends StatelessWidget {
       children: [
         ListView.builder(
           controller: scrollController,
-          padding:  EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.only(bottom: 8),
           itemCount:
               state.displayItems.length + (state.isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
             if (index == state.displayItems.length) {
               return Padding(
-                padding:  EdgeInsets.symmetric(vertical: 24),
+                padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Center(
                   child: SizedBox(
                     width: 24,
@@ -415,11 +416,27 @@ class _TrackList extends StatelessWidget {
               );
             }
 
-         
-            return  SizedBox.shrink();
+            final item = state.displayItems[index];
+            if (item is StickyHeaderItem) {
+              return StickyHeader(label: item.label);
+            } else if (item is TrackListItem) {
+              return TrackTile(
+                track: item.track,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => TrackDetailScreen(track: item.track),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
           },
         ),
 
+        if (state.errorMessage == 'NO INTERNET CONNECTION' &&
+            state.allTracks.isNotEmpty)
+          const Positioned(
+              top: 0, left: 0, right: 0, child: NoInternetBanner()),
       ],
     );
   }
@@ -443,7 +460,7 @@ class _LoadingView extends StatelessWidget {
               color: cs.primary,
             ),
           ),
-           SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
             'Loading your library…',
             style: TextStyle(
@@ -467,7 +484,7 @@ class _NoInternetView extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: 36),
+        padding: const EdgeInsets.symmetric(horizontal: 36),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -479,11 +496,11 @@ class _NoInternetView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(color: Colors.red.withOpacity(0.2)),
               ),
-              child:  Icon(Icons.wifi_off_rounded,
+              child: const Icon(Icons.wifi_off_rounded,
                   size: 40, color: Colors.redAccent),
             ),
-             SizedBox(height: 20),
-             Text(
+            const SizedBox(height: 20),
+            const Text(
               'No Connection',
               style: TextStyle(
                 fontSize: 24,
@@ -492,7 +509,7 @@ class _NoInternetView extends StatelessWidget {
                 letterSpacing: -0.3,
               ),
             ),
-             SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Check your internet connection\nand try again.',
               textAlign: TextAlign.center,
@@ -502,14 +519,14 @@ class _NoInternetView extends StatelessWidget {
                 height: 1.6,
               ),
             ),
-             SizedBox(height: 28),
+            const SizedBox(height: 28),
             FilledButton.icon(
               onPressed: onRetry,
-              icon:  Icon(Icons.refresh_rounded, size: 18),
-              label:  Text('Try Again',
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Try Again',
                   style: TextStyle(fontWeight: FontWeight.w700)),
               style: FilledButton.styleFrom(
-                padding:  EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 28, vertical: 14),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
@@ -532,7 +549,7 @@ class _ErrorView extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: 36),
+        padding: const EdgeInsets.symmetric(horizontal: 36),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -544,11 +561,11 @@ class _ErrorView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: Colors.orange.withOpacity(0.2)),
               ),
-              child:  Icon(Icons.error_outline_rounded,
+              child: const Icon(Icons.error_outline_rounded,
                   size: 36, color: Colors.orange),
             ),
-             SizedBox(height: 16),
-             Text(
+            const SizedBox(height: 16),
+            const Text(
               'Something went wrong',
               style: TextStyle(
                 fontSize: 20,
@@ -556,7 +573,7 @@ class _ErrorView extends StatelessWidget {
                 color: Colors.orange,
               ),
             ),
-             SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
@@ -566,14 +583,14 @@ class _ErrorView extends StatelessWidget {
                 height: 1.5,
               ),
             ),
-             SizedBox(height: 24),
+            const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: onRetry,
-              icon:  Icon(Icons.refresh_rounded, size: 18),
-              label:  Text('Retry',
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Retry',
                   style: TextStyle(fontWeight: FontWeight.w700)),
               style: FilledButton.styleFrom(
-                padding:  EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 28, vertical: 14),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
